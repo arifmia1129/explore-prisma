@@ -5,40 +5,54 @@ const prisma = new PrismaClient();
 export const createPostService = async (post: Post): Promise<Post> => {
   return await prisma.post.create({ data: post });
 };
-export const getPostService = async (options: any): Promise<Post[] | null> => {
-  const { sortBy, sortOrder, searchTerm } = options;
-  return await prisma.post.findMany({
-    include: {
-      user: true,
-      category: true,
-    },
-    orderBy:
-      sortBy && sortOrder
-        ? {
-            [sortBy]: sortOrder,
-          }
-        : {
-            createdAt: "desc",
-          },
+export const getPostService = async (
+  options: any
+): Promise<{ total: number; data: Post[] } | null> => {
+  const { sortBy, sortOrder, searchTerm, page = 1, limit = 2 } = options;
 
-    where: {
-      OR: [
-        {
-          title: {
-            contains: searchTerm,
-            mode: "insensitive",
-          },
-        },
-        {
-          user: {
-            name: {
+  const take = parseInt(limit);
+  const skip = parseInt(limit) * (parseInt(page) - 1);
+
+  return await prisma.$transaction(async (tx) => {
+    const res = await tx.post.findMany({
+      take,
+      skip,
+      include: {
+        user: true,
+        category: true,
+      },
+      orderBy:
+        sortBy && sortOrder
+          ? {
+              [sortBy]: sortOrder,
+            }
+          : {
+              createdAt: "desc",
+            },
+
+      where: {
+        OR: [
+          {
+            title: {
               contains: searchTerm,
               mode: "insensitive",
             },
           },
-        },
-      ],
-    },
+          {
+            user: {
+              name: {
+                contains: searchTerm,
+                mode: "insensitive",
+              },
+            },
+          },
+        ],
+      },
+    });
+
+    const total = await tx.post.count();
+
+    return { data: res, total };
   });
 };
 export const getPostByIdService = async (id: number): Promise<Post | null> => {
