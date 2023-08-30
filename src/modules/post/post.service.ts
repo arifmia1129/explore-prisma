@@ -66,3 +66,23 @@ export const getPostByIdService = async (id: number): Promise<Post | null> => {
     },
   });
 };
+export const updatePostByIdService = async (
+  id: number,
+  payload: Partial<Post>
+): Promise<Post | null> => {
+  return await prisma.post.update({
+    where: {
+      id,
+    },
+    data: payload,
+  });
+};
+export const deletePostByIdService = async (
+  id: number
+): Promise<Post | null> => {
+  return await prisma.post.delete({
+    where: {
+      id,
+    },
+  });
+};
