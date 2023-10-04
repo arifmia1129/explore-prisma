@@ -3,6 +3,7 @@ import * as userController from "./user.controller";
 
 const router = express.Router();
 
+router.get("/learn", userController.learnAggregateGrouping);
 router.get("/", userController.getUser);
 router.get("/:id", userController.getUserById);
 router.post("/create", userController.createUser);

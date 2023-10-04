@@ -8,12 +8,14 @@ export const createUserService = async (user: User): Promise<User> => {
   });
 };
 export const getUserService = async (): Promise<object[]> => {
-  return await prisma.user.findMany({
-    select: {
-      email: true,
-      id: true,
-    },
-  });
+  // return await prisma.user.findMany({
+  //   select: {
+  //     email: true,
+  //     id: true,
+  //   },
+  // });
+
+  return await prisma.$queryRaw`select * from users`;
 };
 export const getUserByIdService = async (id: number): Promise<User> => {
   const user = await prisma.user.findUnique({
@@ -56,5 +58,29 @@ export const createUpdateUserProfileService = async (
       data: profile,
     });
   }
+  return res;
+};
+
+export const learnAggregateGroupingService = async () => {
+  // const res = await prisma.post.aggregate({
+  //   _avg: {
+  //     authorId: true,
+  //     categoryId: true,
+  //   },
+  //   _count: {
+  //     authorId: true,
+  //   },
+  //   _sum: {
+  //     authorId: true,
+  //   },
+  // });
+
+  const res = await prisma.post.groupBy({
+    by: ["title"],
+    _count: {
+      title: true,
+    },
+  });
+
   return res;
 };

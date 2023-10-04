@@ -70,3 +70,20 @@ export const createUpdateUserProfile = async (req: Request, res: Response) => {
     });
   }
 };
+export const learnAggregateGrouping = async (req: Request, res: Response) => {
+  try {
+    const result = await userService.learnAggregateGroupingService();
+    res.status(200).json({
+      success: true,
+      statusCode: 200,
+      message: "Success",
+      data: result,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      statusCode: 400,
+      message: "Failed",
+    });
+  }
+};
